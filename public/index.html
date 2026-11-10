@@ -109,7 +109,7 @@ h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.55;marg
       <h1>Thinking<span>Partner</span></h1>
       <select id="mode" aria-label="Conversation mode"></select>
       <div class="seg" id="providers" aria-label="Reasoning model">
-        <button data-provider="local" class="active" title="Free · runs on your Mac">Local</button>
+        <button data-provider="local" class="active" title="Free · runs on your Mac">Qwen</button>
         <button data-provider="claude" title="Your Anthropic API key">Claude</button>
         <button data-provider="openai" title="Your OpenAI API key">ChatGPT</button>
       </div>
@@ -185,13 +185,13 @@ h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.55;marg
     <section data-id="engines">
       <h2>Which AI should ThinkingPartner use?</h2>
       <p class="lead">Pick one or more. If you set up several, you can switch between them any time from your iPad. Transcription always runs privately on your Mac.</p>
-      <button class="choice" data-engine="local"><span class="tick"></span><b>Free, on this Mac</b> <span class="badge">Private</span> <span class="badge gray" data-ready="local">Ready</span>
+      <button class="choice" data-engine="local"><span class="tick"></span><b>Qwen, free on this Mac</b> <span class="badge">Private</span> <span class="badge gray" data-ready="local">Ready</span>
         <div class="d">Qwen, an open model that runs on your Mac through Ollama. No account, no cost, works offline. One-time download of 3–9 GB.</div></button>
       <button class="choice" data-engine="claude"><span class="tick"></span><b>Claude</b> <span class="badge gray">Your API key</span> <span class="badge gray" data-ready="claude">Ready</span>
         <div class="d">Anthropic's Claude. Strong reasoning and screen reading. You pay Anthropic for what you use.</div></button>
       <button class="choice" data-engine="openai"><span class="tick"></span><b>ChatGPT</b> <span class="badge gray">Your API key</span> <span class="badge gray" data-ready="openai">Ready</span>
         <div class="d">OpenAI's models. Strong reasoning and screen reading. You pay OpenAI for what you use.</div></button>
-      <p class="small" style="max-width:none;text-align:left;white-space:normal">Tip: also tick the free option, so you still get answers if you hit your spending limit.</p>
+      <p class="small" style="max-width:none;text-align:left;white-space:normal">Tip: also tick Qwen, so you still get answers if you hit your spending limit.</p>
       <div class="nav"><span></span><button class="wbtn" id="nextEngines" disabled>Continue</button></div>
     </section>
 
@@ -377,7 +377,7 @@ $('fileInput').onchange=e=>uploadFiles(e.target.files,$('fileErr')).then(()=>e.t
 // ---------------- setup wizard (runs on the Mac only)
 // The flow is built from what the user ticks: engines → [local] → [claude] → [openai] → docs → pair
 const W={flow:['engines','docs','pair'],idx:0,picked:new Set(),touched:false,setup:null,selModel:null,limit:null,timer:null,def:null};
-const NAMES={local:'Free (on this Mac)',claude:'Claude',openai:'ChatGPT'};
+const NAMES={local:'Qwen (on this Mac)',claude:'Claude',openai:'ChatGPT'};
 const KEY_HELP={
   claude:'Get a key at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> → API Keys → Create key. It starts with <code>sk-ant-</code>.',
   openai:'Get a key at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com</a> → API keys → Create new secret key. It starts with <code>sk-</code>.'};

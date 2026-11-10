@@ -69,8 +69,8 @@ cd thinkingpartner
 
 **3. Follow the setup screen** that opens in your browser:
 
-- **Choose which AI to use.** Tick any combination: Free (Qwen on your Mac), Claude, ChatGPT. Setup then walks you through each one:
-  - *Free, on this Mac:* checks whether Ollama and Qwen are installed, recommends a model size based on your Mac's memory, and downloads it with one click.
+- **Choose which AI to use.** Tick any combination: Qwen (free, on your Mac), Claude, ChatGPT. Setup then walks you through each one:
+  - *Qwen, free on this Mac:* checks whether Ollama and Qwen are installed, recommends a model size based on your Mac's memory, and downloads it with one click.
   - *Claude / ChatGPT:* paste your API key (it's verified, then saved in your Keychain). Set one spending limit shared by both.
   - If you set up more than one, pick which to start with. You can switch any time from the buttons at the top of the iPad screen.
 - **Add documents** (optional): your CV, briefs, notes.
