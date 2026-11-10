@@ -26,8 +26,22 @@ echo "==> Building speech-to-text (whisper.cpp)… this takes a few minutes the 
 echo "==> Building the audio bridge…"
 swift build -c release
 
-echo "==> Installing Python packages…"
-python3 -m pip install --user --quiet -r requirements.txt
+echo "==> Setting up Python…"
+# The Claude library needs Python 3.10+. macOS ships 3.9, so find or install a newer one.
+PY=""
+for cand in python3.13 python3.12 python3.11 python3.10 python3; do
+  if command -v "$cand" >/dev/null && "$cand" -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>/dev/null; then
+    PY="$(command -v "$cand")"; break
+  fi
+done
+if [ -z "$PY" ]; then
+  echo "==> Installing Python 3.12 with Homebrew…"
+  brew install python@3.12
+  PY="$(brew --prefix python@3.12)/bin/python3.12"
+fi
+[ -x .venv/bin/python ] && .venv/bin/python -c 'import sys; sys.exit(sys.version_info < (3, 10))' 2>/dev/null || { rm -rf .venv; "$PY" -m venv .venv; }
+.venv/bin/python -m pip install --quiet --upgrade pip
+.venv/bin/python -m pip install --quiet -r requirements.txt
 
 mkdir -p context
 echo

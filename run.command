@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 AUDIO_DIR="${TP_AUDIO_DIR:-/tmp/thinkingpartner}"
 
 pkill -f "/audio-bridge" 2>/dev/null || true
-pkill -f "python3 server.py" 2>/dev/null || true
+pkill -f "python[0-9.]* server.py" 2>/dev/null || true
 rm -rf "$AUDIO_DIR"
 mkdir -p "$AUDIO_DIR"
 
@@ -27,6 +27,8 @@ if command -v ollama >/dev/null 2>&1 && ! curl -fsS http://127.0.0.1:11434/api/t
   sleep 2
 fi
 
-python3 server.py &
+PY=python3
+[ -x .venv/bin/python ] && PY=.venv/bin/python
+"$PY" server.py &
 SERVER_PID=$!
 wait "$SERVER_PID"

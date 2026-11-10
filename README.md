@@ -52,7 +52,7 @@ Transcription always runs locally (whisper.cpp). Cloud providers only receive th
 ## Requirements
 
 - macOS 14+ (macOS 15+ to capture your microphone). Apple Silicon recommended.
-- [Homebrew](https://brew.sh), Xcode Command Line Tools, Python 3
+- [Homebrew](https://brew.sh) and Xcode Command Line Tools (setup installs a newer Python if yours is older than 3.10)
 - Optional: [Ollama](https://ollama.com) for the free local model
 
 ## Getting started

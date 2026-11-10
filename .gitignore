@@ -19,3 +19,4 @@ merge_interview*.py
 whisper.cpp/
 __pycache__/
 .DS_Store
+.venv/
