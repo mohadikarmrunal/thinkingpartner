@@ -3,7 +3,6 @@
 set -e
 cd "$(dirname "$0")"
 
-OLLAMA_MODEL="${TP_OLLAMA_MODEL:-qwen3:8b}"
 AUDIO_DIR="${TP_AUDIO_DIR:-/tmp/thinkingpartner}"
 
 pkill -f "/audio-bridge" 2>/dev/null || true
@@ -22,18 +21,10 @@ echo "Starting audio capture…"
 AUDIO_PID=$!
 sleep 2
 
-if command -v ollama >/dev/null 2>&1; then
-  if ! curl -fsS http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
-    echo "Starting Ollama…"
-    ollama serve >/tmp/thinkingpartner-ollama.log 2>&1 &
-    sleep 2
-  fi
-  if ! ollama list 2>/dev/null | grep -q "^${OLLAMA_MODEL}"; then
-    echo "NOTE: local model ${OLLAMA_MODEL} is not installed. Run: ollama pull ${OLLAMA_MODEL}"
-    echo "      (Claude / ChatGPT still work if you add an API key.)"
-  fi
-else
-  echo "NOTE: Ollama not found — the free local model is unavailable. Install from https://ollama.com"
+# Start Ollama in the background if it's installed (the setup screen handles models).
+if command -v ollama >/dev/null 2>&1 && ! curl -fsS http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
+  ollama serve >/tmp/thinkingpartner-ollama.log 2>&1 &
+  sleep 2
 fi
 
 python3 server.py &
