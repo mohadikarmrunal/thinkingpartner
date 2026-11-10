@@ -1,6 +1,6 @@
 # ThinkingPartner
 
-**A live AI thinking partner for your conversations — on a second screen, so nothing shows up when you share yours.**
+**A live AI thinking partner for your conversations — on a second device, so nothing shows up when you share yours.**
 
 ThinkingPartner listens to a conversation on your Mac, transcribes it on-device, and shows short, glanceable suggestions grounded in *your own documents*. You read them on an iPad, phone, or second laptop. Your Mac's screen stays clean, so you can share it freely.
 
@@ -12,7 +12,7 @@ Use it for interviews, meetings, lectures, and brainstorms.
 
 | | |
 |---|---|
-| 🖥️ **Nothing on your shared screen** | Suggestions are shown on a second device, not in a window on your Mac. When you share your screen, there's nothing for ThinkingPartner to reveal. |
+| 🖥️ **Nothing on your shared screen** | Suggestions are shown on a second device, not in a window on your Mac. When you share your Mac screen on a call, there's nothing for ThinkingPartner to reveal. |
 | 📱 **Any device is the display** | Open a link on your iPad, phone, or another laptop on the same Wi‑Fi. Add it to your home screen for a full-screen view. A pairing token keeps other people on the network out. |
 | 📄 **Knows your context** | Drop in your CV, project briefs, meeting notes, or articles. Suggestions draw on them. |
 | 🎤 **Both sides of the conversation** | Captures system audio (the other people) and your mic separately, so it knows who said what. |
