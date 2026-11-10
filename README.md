@@ -73,7 +73,7 @@ cd thinkingpartner
   - *Qwen, free on this Mac:* checks whether Ollama and Qwen are installed, recommends a model size based on your Mac's memory, and downloads it with one click.
   - *Claude / ChatGPT:* paste your API key (it's verified, then saved in your Keychain). Set one spending limit shared by both.
   - If you set up more than one, pick which to start with. You can switch any time from the buttons at the top of the iPad screen.
-- **Add documents** (optional): your CV, briefs, notes.
+- **Add documents** (optional): your CV, briefs, notes. PDF, Word, PowerPoint, Excel, text files and photos or scans all work (scans are read on your Mac). Short, text-based documents work best.
 - **Pair your iPad or phone:** scan the QR code with the camera, then Share → Add to Home Screen.
 
 **Every call after that:** double-click `run.command`, open ThinkingPartner on your iPad, pick a mode, and start your call. The pairing link stays the same, so your home-screen icon keeps working.

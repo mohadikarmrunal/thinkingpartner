@@ -7,6 +7,8 @@ import AudioToolbox
 import CoreImage
 import ImageIO
 import UniformTypeIdentifiers
+import Vision
+import PDFKit
 
 final class AudioWriter: NSObject, SCStreamOutput, SCStreamDelegate {
     private let base = URL(fileURLWithPath: "/tmp/thinkingpartner", isDirectory: true)
@@ -208,12 +210,53 @@ func writeQRCode(_ text: String, to path: String) -> Bool {
     return CGImageDestinationFinalize(dest)
 }
 
+/// `audio-bridge --ocr <file>` prints the text found in an image or a scanned PDF (on-device Vision OCR).
+func recognizeText(in image: CGImage) -> String {
+    let request = VNRecognizeTextRequest()
+    request.recognitionLevel = .accurate
+    request.usesLanguageCorrection = true
+    try? VNImageRequestHandler(cgImage: image, options: [:]).perform([request])
+    return (request.results ?? []).compactMap { $0.topCandidates(1).first?.string }.joined(separator: "\n")
+}
+
+func ocrFile(_ path: String) -> Bool {
+    let url = URL(fileURLWithPath: path)
+    var pages: [String] = []
+    if url.pathExtension.lowercased() == "pdf" {
+        guard let doc = PDFDocument(url: url) else { return false }
+        for i in 0..<min(doc.pageCount, 50) {
+            guard let page = doc.page(at: i) else { continue }
+            let box = page.bounds(for: .mediaBox)
+            let scale = 2.0
+            let size = CGSize(width: box.width * scale, height: box.height * scale)
+            guard let ctx = CGContext(data: nil, width: Int(size.width), height: Int(size.height),
+                                      bitsPerComponent: 8, bytesPerRow: 0,
+                                      space: CGColorSpaceCreateDeviceRGB(),
+                                      bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue) else { continue }
+            ctx.setFillColor(CGColor(gray: 1, alpha: 1))
+            ctx.fill(CGRect(origin: .zero, size: size))
+            ctx.scaleBy(x: scale, y: scale)
+            page.draw(with: .mediaBox, to: ctx)
+            if let img = ctx.makeImage() { pages.append(recognizeText(in: img)) }
+        }
+    } else {
+        guard let src = CGImageSourceCreateWithURL(url as CFURL, nil),
+              let img = CGImageSourceCreateImageAtIndex(src, 0, nil) else { return false }
+        pages.append(recognizeText(in: img))
+    }
+    print(pages.joined(separator: "\n\n"))
+    return true
+}
+
 @main
 struct Main {
     static func main() async {
         let args = CommandLine.arguments
         if args.count == 4 && args[1] == "--qr" {
             exit(writeQRCode(args[2], to: args[3]) ? 0 : 1)
+        }
+        if args.count == 3 && args[1] == "--ocr" {
+            exit(ocrFile(args[2]) ? 0 : 1)
         }
         do {
             let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: false)

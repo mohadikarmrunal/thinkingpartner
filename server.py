@@ -134,7 +134,11 @@ CHUNK_BYTES = 128000
 # Devices on your network must present this token (in the pairing link) to read the feed.
 ACCESS_TOKEN = SETTINGS["token"]
 
-CONTEXT_EXTS = {".txt", ".md", ".markdown", ".csv", ".json", ".pdf", ".docx", ".rtf", ".html"}
+TEXT_EXTS = {".txt", ".md", ".markdown", ".csv", ".tsv", ".json"}
+TEXTUTIL_EXTS = {".docx", ".doc", ".rtf", ".odt", ".html", ".htm", ".webarchive"}
+OFFICE_EXTS = {".pptx", ".xlsx"}
+IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".heic", ".tiff", ".gif", ".webp"}
+CONTEXT_EXTS = TEXT_EXTS | TEXTUTIL_EXTS | OFFICE_EXTS | IMAGE_EXTS | {".pdf"}
 MAX_CONTEXT_CHARS = int(os.environ.get("TP_MAX_CONTEXT_CHARS", "60000"))
 
 
@@ -254,22 +258,84 @@ lock = threading.Lock()
 
 # ---------------------------------------------------------------- documents
 
+def ocr_text(path):
+    """On-device OCR (Apple Vision) for images and scanned PDFs, via the audio bridge."""
+    if not BRIDGE.exists():
+        return ""
+    try:
+        cp = subprocess.run([str(BRIDGE), "--ocr", str(path)], capture_output=True, text=True, timeout=180)
+        return cp.stdout if cp.returncode == 0 else ""
+    except (subprocess.TimeoutExpired, OSError):
+        return ""
+
+
+def office_text(path):
+    """Text from PowerPoint (.pptx) slides or Excel (.xlsx) sheets, using only the standard library."""
+    import zipfile
+    from xml.etree import ElementTree as ET
+
+    def texts(xml):
+        return [el.text for el in ET.fromstring(xml).iter() if el.tag.endswith("}t") and el.text]
+
+    def num(name):
+        m = re.search(r"(\d+)\.xml$", name)
+        return int(m.group(1)) if m else 0
+
+    try:
+        with zipfile.ZipFile(path) as z:
+            names = z.namelist()
+            if path.suffix.lower() == ".pptx":
+                slides = sorted((n for n in names if re.match(r"ppt/slides/slide\d+\.xml$", n)), key=num)
+                return "\n\n".join(f"[Slide {num(n)}]\n" + "\n".join(texts(z.read(n))) for n in slides)
+            shared = texts(z.read("xl/sharedStrings.xml")) if "xl/sharedStrings.xml" in names else []
+            out = []
+            for n in sorted((n for n in names if re.match(r"xl/worksheets/sheet\d+\.xml$", n)), key=num):
+                rows = []
+                for row in ET.fromstring(z.read(n)).iter():
+                    if not row.tag.endswith("}row"):
+                        continue
+                    cells = []
+                    for c in row:
+                        v = next((x.text for x in c if x.tag.endswith("}v")), None)
+                        inline = "".join(t.text or "" for t in c.iter() if t.tag.endswith("}t"))
+                        if c.get("t") == "s" and v is not None and v.isdigit() and int(v) < len(shared):
+                            cells.append(shared[int(v)])
+                        elif inline:
+                            cells.append(inline)
+                        elif v is not None:
+                            cells.append(v)
+                    if cells:
+                        rows.append(", ".join(cells))
+                out.append(f"[Sheet {num(n)}]\n" + "\n".join(rows))
+            return "\n\n".join(out)
+    except Exception:
+        return ""
+
+
 def extract_text(path):
     ext = path.suffix.lower()
-    if ext in (".txt", ".md", ".markdown", ".csv", ".json"):
+    if ext in TEXT_EXTS:
         return path.read_text(errors="ignore")
-    if ext in (".docx", ".rtf", ".html"):
+    if ext in TEXTUTIL_EXTS:
         cp = subprocess.run(["textutil", "-convert", "txt", "-stdout", str(path)],
-                            capture_output=True, text=True, timeout=20)
+                            capture_output=True, text=True, timeout=30)
         return cp.stdout if cp.returncode == 0 else ""
+    if ext in OFFICE_EXTS:
+        return office_text(path)
+    if ext in IMAGE_EXTS:
+        return ocr_text(path)
     if ext == ".pdf":
+        text = ""
         try:
-            from pypdf import PdfReader  # optional: pip install pypdf
-            return "\n".join((p.extract_text() or "") for p in PdfReader(str(path)).pages)
-        except ImportError:
-            return "[PDF skipped — run `pip3 install pypdf` to read PDFs]"
-        except Exception as e:
-            return f"[Could not read PDF: {e}]"
+            from pypdf import PdfReader
+            reader = PdfReader(str(path))
+            text = "\n".join((p.extract_text() or "") for p in reader.pages)
+            # Scanned PDFs have (almost) no text layer: read the pages with OCR instead.
+            if len(text.strip()) < 40 * max(1, len(reader.pages)):
+                text = ocr_text(path) or text
+        except Exception:
+            text = ocr_text(path)
+        return text
     return ""
 
 
@@ -290,6 +356,7 @@ def load_context():
     for p in paths:
         text = extract_text(p).strip()
         if not text:
+            files.append({"name": p.name, "chars": 0, "included": False, "unreadable": True})
             continue
         room = MAX_CONTEXT_CHARS - used
         if room <= 0:

@@ -16,6 +16,9 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+# Rebuild the audio bridge if the code changed (instant when nothing changed).
+swift build -c release >/dev/null 2>&1 || echo "Note: could not rebuild the audio bridge; run ./scripts/setup.sh"
+
 echo "Starting audio capture…"
 .build/release/audio-bridge &
 AUDIO_PID=$!

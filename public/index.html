@@ -100,6 +100,7 @@ h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.55;marg
 .wiz a{color:#7c9cff}
 .remote-wait{display:none;position:fixed;inset:0;background:#111;z-index:25;align-items:center;justify-content:center;text-align:center;padding:30px}
 .remote-wait.open{display:flex}
+.doc-tip{font-size:12px;opacity:.7;margin-left:0;overflow:visible;max-width:none;text-align:left;white-space:normal;margin-top:10px;line-height:1.45}
 </style>
 </head>
 <body>
@@ -163,8 +164,8 @@ h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.55;marg
     <h3>Your documents</h3>
     <p>CV, briefs, notes, articles — used as background for every suggestion. Stored only on your Mac.</p>
     <div id="files"></div>
-    <input type="file" id="fileInput" multiple accept=".txt,.md,.markdown,.csv,.json,.pdf,.docx,.rtf,.html" style="margin-top:10px;font-size:12px">
-    <div class="err" id="fileErr"></div>
+    <input type="file" id="fileInput" multiple accept=".pdf,.docx,.doc,.pptx,.xlsx,.txt,.md,.markdown,.csv,.tsv,.json,.rtf,.odt,.html,.htm,.webarchive,.png,.jpg,.jpeg,.heic,.tiff,.gif,.webp" style="margin-top:10px;font-size:12px">
+    <p class="small doc-tip">Works with PDF, Word, PowerPoint, Excel, text files, and photos or scans (read on your Mac). <b>*</b> Best results come from short, text-based documents: headings and bullet points rather than charts, images or complex layouts. About the first 60,000 characters across all documents are used.</p><div class="err" id="fileErr"></div>
 
     <h3>Model &amp; spending</h3>
     <div id="hostSettings">
@@ -239,7 +240,7 @@ h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.55;marg
     <section data-id="docs">
       <h2>Add your documents <span class="badge gray">Optional</span></h2>
       <p class="lead">Your CV, project brief, meeting notes or prep. ThinkingPartner uses them to give answers that sound like you. They stay on your Mac.</p>
-      <div class="box"><div id="wizFiles"></div><input type="file" id="wizFileInput" multiple accept=".txt,.md,.markdown,.csv,.json,.pdf,.docx,.rtf,.html" style="margin-top:10px"><div class="err" id="wizFileErr"></div></div>
+      <div class="box"><div id="wizFiles"></div><input type="file" id="wizFileInput" multiple accept=".pdf,.docx,.doc,.pptx,.xlsx,.txt,.md,.markdown,.csv,.tsv,.json,.rtf,.odt,.html,.htm,.webarchive,.png,.jpg,.jpeg,.heic,.tiff,.gif,.webp" style="margin-top:10px"><div class="err" id="wizFileErr"></div><p class="small doc-tip">Works with PDF, Word, PowerPoint, Excel, text files, and photos or scans (read on your Mac). <b>*</b> Best results come from short, text-based documents: headings and bullet points rather than charts, images or complex layouts. About the first 60,000 characters across all documents are used.</p></div>
       <div class="box" id="defaultBox">
         <b>Start with</b>
         <p class="lead" style="margin:6px 0 12px;font-size:14px">Which one should answer when you open ThinkingPartner? You can switch any time with the buttons at the top of the iPad screen.</p>
@@ -332,7 +333,7 @@ function render(s){
   files.forEach(f=>{
     const row=document.createElement('div');row.className='file';
     const name=document.createElement('span');name.textContent=f.name+' ';
-    const meta=document.createElement('small');meta.textContent=Math.round(f.chars/1000)+'k chars'+(f.included?'':' · partly used');
+    const meta=document.createElement('small');meta.textContent=f.unreadable?'no readable text found':Math.round(f.chars/1000)+'k chars'+(f.included?'':' · partly used');
     name.appendChild(meta);
     const del=document.createElement('button');del.textContent='Remove';
     del.onclick=()=>api('/api/context/delete',{name:f.name}).then(render).catch(e=>$('fileErr').textContent=e.message);
@@ -341,7 +342,7 @@ function render(s){
   $('hostSettings').style.display=s.is_host?'':'none';
   $('remoteSettings').style.display=s.is_host?'none':'';
   $('connectBtn').style.display=s.is_host?'':'none';
-  $('wizFiles').innerHTML=files.length?files.map(f=>'• '+f.name.replace(/[<>&]/g,'')).join('<br>'):'<span class="muted">No documents yet.</span>';
+  $('wizFiles').innerHTML=files.length?files.map(f=>'• '+f.name.replace(/[<>&]/g,'')+(f.unreadable?' <span class="muted">(no readable text found)</span>':'')).join('<br>'):'<span class="muted">No documents yet.</span>';
   // first run: wizard on the Mac, waiting screen elsewhere
   if(!s.setup_complete){
     if(s.is_host){if(!$('setup').classList.contains('open'))openSetup('engines')}
