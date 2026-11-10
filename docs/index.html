@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ThinkingPartner — a live AI thinking partner on your second screen</title>
-<meta name="description" content="ThinkingPartner listens to your conversation, knows your documents, and shows smart replies on your iPad or phone — nothing appears on the screen you share. Free on-device, or bring your Claude / ChatGPT key.">
+<meta name="description" content="ThinkingPartner listens to your conversation, knows your documents, and shows smart replies on your second device — nothing appears on the screen you share. Free on-device, or bring your Claude / ChatGPT key.">
 <style>
 :root{--bg:#0d0d0f;--card:#17171a;--line:#2a2a2f;--text:#ededf0;--dim:#9a9aa3;--accent:#7c9cff}
 *{box-sizing:border-box}
@@ -35,21 +35,16 @@ h1{font-size:clamp(34px,5vw,54px);line-height:1.05;margin:0 0 18px;letter-spacin
 section{padding:64px 0;border-top:1px solid var(--line)}
 h2{font-size:30px;margin:0 0 10px;letter-spacing:-.01em}
 .sub{color:var(--dim);margin:0 0 32px;font-size:17px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
 .card .i{font-size:24px;margin-bottom:10px}
 .card h3{margin:0 0 6px;font-size:17px}
 .card p{margin:0;color:var(--dim);font-size:15px}
-.feature{border-color:#33406b;background:linear-gradient(180deg,#1a1f33,#17171a)}
-.modes{display:flex;flex-wrap:wrap;gap:10px}
-.mode{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:10px 16px;font-size:15px}
-.mode small{color:var(--dim)}
 .pricing{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .price{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px}
 .price .tag{font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
 .price .amt{font-size:34px;font-weight:700;margin:6px 0 12px}
 .price ul{margin:0;padding-left:18px;color:var(--dim)}.price li{margin:6px 0}
-.price.pro{border-color:#33406b}
 .steps{counter-reset:s;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .steps.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 .phase{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:28px 0 12px}
@@ -59,6 +54,7 @@ code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
 pre{white-space:pre-wrap;word-break:break-all;background:#0a0a0c;border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;margin:10px 0 0}
 .note{color:var(--dim);font-size:14px;max-width:46em}
 footer{padding:36px 0 56px;color:var(--dim);font-size:14px;border-top:1px solid var(--line)}
+@media(max-width:1000px){.grid,.steps.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:860px){.hero{grid-template-columns:1fr}.grid,.steps,.steps.four{grid-template-columns:1fr}.pricing{grid-template-columns:1fr}.stage{height:320px}}
 </style>
 </head>
@@ -73,7 +69,7 @@ footer{padding:36px 0 56px;color:var(--dim);font-size:14px;border-top:1px solid 
     <div>
       <div class="pill">Open source · macOS</div>
       <h1>An AI thinking partner that stays off your shared screen.</h1>
-      <p class="lede">ThinkingPartner listens to your conversation, knows your documents, and shows smart replies on your iPad or phone. Share your Mac screen freely — there's nothing on it to see.</p>
+      <p class="lede">ThinkingPartner listens to your conversation on your Mac and shows smart replies, grounded in your documents, on your second device. Share your Mac screen freely — there's nothing on it to see.</p>
       <div class="cta">
         <a class="btn primary" href="https://github.com/mohadikarmrunal/thinkingpartner#getting-started">Get started free</a>
         <a class="btn ghost" href="#how">How to use it</a>
@@ -102,12 +98,10 @@ footer{padding:36px 0 56px;color:var(--dim);font-size:14px;border-top:1px solid 
     <h2>Built for live conversations</h2>
     <p class="sub">Transcribes both sides, understands the context, and suggests what to say next.</p>
     <div class="grid">
-      <div class="card feature"><div class="i">🖥️</div><h3>Nothing on your shared screen</h3><p>Suggestions show up on a second device, not in a window on your Mac. Present, demo, or pair-program with confidence.</p></div>
-      <div class="card feature"><div class="i">📱</div><h3>Any device is the display</h3><p>Open one link on your iPad, phone, or another laptop. Add it to your home screen for a full-screen view. Pairing keeps others on the Wi‑Fi out.</p></div>
+      <div class="card"><div class="i">🖥️</div><h3>Present with confidence</h3><p>Suggestions show up on a second device, not in a window on your Mac. Present, demo, or share your screen freely.</p></div>
       <div class="card"><div class="i">📄</div><h3>Knows your context</h3><p>Upload your CV, briefs, notes, or articles. Every suggestion draws on them.</p></div>
       <div class="card"><div class="i">🎤</div><h3>Hears both sides</h3><p>Captures system audio and your mic separately, so it knows who asked and who answered.</p></div>
-      <div class="card"><div class="i">💬</div><h3>Glanceable replies</h3><p>One sentence to say now, up to three points, and a bottom line. Pin an answer to keep it on screen.</p></div>
-      <div class="card"><div class="i">👁️</div><h3>Reads your screen on demand</h3><p>Tap Read Screen to pull in a slide, case exhibit, or spreadsheet (Claude or ChatGPT).</p></div>
+      <div class="card"><div class="i">👁️</div><h3>Reads your screen on demand</h3><p>Tap Read Screen to pull in a slide, case exhibit, or spreadsheet, so Claude or ChatGPT understands the context better.</p></div>
     </div>
   </div>
 </section>
@@ -116,11 +110,11 @@ footer{padding:36px 0 56px;color:var(--dim);font-size:14px;border-top:1px solid 
   <div class="wrap">
     <h2>One tool, many conversations</h2>
     <p class="sub">Switch modes in one tap. Each mode changes what ThinkingPartner looks for.</p>
-    <div class="modes">
-      <div class="mode">🎯 Interview <small>— answer with your background</small></div>
-      <div class="mode">🗂️ Meeting <small>— answer from your notes, catch decisions</small></div>
-      <div class="mode">📚 Learning <small>— plain-language explanations</small></div>
-      <div class="mode">💡 Brainstorm <small>— new angles and next steps</small></div>
+    <div class="grid">
+      <div class="card"><div class="i">🎯</div><h3>Interview</h3><p>Helps you answer the current question using your background.</p></div>
+      <div class="card"><div class="i">🗂️</div><h3>Meeting</h3><p>Answers points aimed at you from your notes and catches decisions.</p></div>
+      <div class="card"><div class="i">📚</div><h3>Learning</h3><p>Explains the topic in plain language and suggests a good question.</p></div>
+      <div class="card"><div class="i">💡</div><h3>Brainstorm</h3><p>Builds on ideas with new angles, contrarian takes, and next steps.</p></div>
     </div>
   </div>
 </section>
@@ -128,7 +122,7 @@ footer{padding:36px 0 56px;color:var(--dim);font-size:14px;border-top:1px solid 
 <section>
   <div class="wrap">
     <h2>Free and private, or more powerful. Your choice.</h2>
-    <p class="sub">Switch models mid-conversation from your iPad.</p>
+    <p class="sub">Switch models mid-conversation from your second device.</p>
     <div class="pricing">
       <div class="price">
         <div class="tag">Local</div>
@@ -139,7 +133,7 @@ footer{padding:36px 0 56px;color:var(--dim);font-size:14px;border-top:1px solid 
           <li>Nothing leaves your computer</li>
         </ul>
       </div>
-      <div class="price pro">
+      <div class="price">
         <div class="tag">Claude or ChatGPT</div>
         <div class="amt">Bring your own key</div>
         <ul>
@@ -163,19 +157,19 @@ footer{padding:36px 0 56px;color:var(--dim);font-size:14px;border-top:1px solid 
       <div class="step"><h3>Install</h3><p class="note">Open Terminal and paste:</p><pre>git clone https://github.com/mohadikarmrunal/thinkingpartner.git
 cd thinkingpartner
 ./scripts/setup.sh</pre></div>
-      <div class="step"><h3>Start it</h3><p class="note">Double-click <code>run.command</code>. Allow <b>Screen Recording</b> and <b>Microphone</b> when macOS asks, then start it again. Setup opens in your browser.</p></div>
-      <div class="step"><h3>Pick your AI</h3><p class="note">Tick Free (Qwen), Claude, ChatGPT, or all three. For Qwen it recommends the right size for your Mac and downloads it in one click. For Claude/ChatGPT, paste your key and set a spending limit.</p></div>
-      <div class="step"><h3>Pair your iPad</h3><p class="note">Add your documents if you like, then scan the QR code with your iPad or phone camera. Tap Share → Add to Home Screen.</p></div>
+      <div class="step"><h3>Start it</h3><p class="note">In the same Terminal, run <code>./run.command</code>. Allow <b>Screen Recording</b> and <b>Microphone</b> when macOS asks, then start it again. Setup opens in your browser.</p></div>
+      <div class="step"><h3>Pick your AI</h3><p class="note">Tick Qwen (free), Claude, ChatGPT, or all three. For Qwen it recommends the right size for your Mac and downloads it in one click. For Claude/ChatGPT, paste your key and set a spending limit.</p></div>
+      <div class="step"><h3>Pair your second device</h3><p class="note">Add your documents if you like, then scan the QR code with your iPad or phone camera. Tap Share → Add to Home Screen.</p></div>
     </div>
 
     <h3 class="phase">Every call</h3>
     <div class="steps four">
-      <div class="step"><h3>Start</h3><p class="note">Double-click <code>run.command</code> on your Mac.</p></div>
-      <div class="step"><h3>Open</h3><p class="note">Tap ThinkingPartner on your iPad's home screen. It reconnects automatically.</p></div>
+      <div class="step"><h3>Start</h3><p class="note">Double-click <code>run.command</code> in the thinkingpartner folder, or run <code>./run.command</code> in Terminal.</p></div>
+      <div class="step"><h3>Open</h3><p class="note">Tap ThinkingPartner on your second device's home screen. It reconnects automatically.</p></div>
       <div class="step"><h3>Pick a mode</h3><p class="note">Interview, Meeting, Learning or Brainstorm.</p></div>
-      <div class="step"><h3>Talk</h3><p class="note">Join your call as usual and share your screen if you need to. Glance at the iPad; tap <b>Pin</b> to keep an answer.</p></div>
+      <div class="step"><h3>Talk</h3><p class="note">Join your call as usual and share your screen if you need to. Glance at your second device; tap <b>Pin</b> to keep an answer.</p></div>
     </div>
-    <p class="note" style="margin-top:22px">Requirements: a Mac with macOS 14 or later (15+ to hear your own microphone), Apple Silicon recommended. Your iPad or phone just needs a web browser and the same Wi‑Fi.</p>
+    <p class="note" style="margin-top:22px">Requirements: a Mac with macOS 14 or later (15+ to hear your own microphone), Apple Silicon recommended. Your second device just needs a web browser and the same Wi‑Fi.</p>
   </div>
 </section>
 
