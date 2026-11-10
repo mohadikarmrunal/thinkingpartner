@@ -1,0 +1,21 @@
+# Your private data — never commit
+context/*
+!context/README.md
+interview-recordings/
+recordings/
+interview_profile.txt*
+.api-spend.json
+settings.json
+*.tmp
+
+# Old working copies
+*.backup
+*.before-*
+backups/
+merge_interview*.py
+
+# Build artifacts & third-party checkouts
+.build/
+whisper.cpp/
+__pycache__/
+.DS_Store

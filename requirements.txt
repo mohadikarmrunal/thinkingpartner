@@ -1,0 +1,3 @@
+# Only needed for the Claude provider / PDF documents. The free local mode needs neither.
+anthropic>=1.0
+pypdf>=4.0

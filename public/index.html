@@ -1,0 +1,536 @@
+<!doctype html>
+<!-- Copyright 2026 Mrunal Mohadikar · SPDX-License-Identifier: Apache-2.0 -->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ThinkingPartner</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#111;color:#eee}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif}
+main{width:min(1200px,100%);margin:0 auto;padding:10px 12px 14px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 2px 8px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+h1{font-size:18px;margin:0;font-weight:650;white-space:nowrap}
+h1 span{opacity:.5;font-weight:500}
+.seg{display:flex;background:#1c1c1e;border:1px solid #3a3a3c;border-radius:9px;padding:2px;gap:2px}
+.seg button{appearance:none;border:0;background:transparent;color:#aaa;font:inherit;font-size:12px;font-weight:650;padding:6px 9px;border-radius:7px;cursor:pointer}
+.seg button.active{background:#f2f2f7;color:#111}
+.seg button:disabled{opacity:.35;cursor:default}
+select,.btn{appearance:none;border:1px solid #3a3a3c;background:#1c1c1e;color:#eee;border-radius:8px;padding:6px 9px;font:inherit;font-size:12px;font-weight:650;cursor:pointer}
+.btn:disabled{opacity:.35;cursor:default}
+.right-status{text-align:right;min-width:120px}
+.status{font-size:13px;opacity:.62}
+.small{font-size:10px;opacity:.42;margin-top:2px;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;margin-left:auto}
+.transcripts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.card{background:#1c1c1e;border-radius:12px;padding:10px 12px}
+.transcript-card{height:112px;overflow:hidden}
+h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.55;margin:0 0 6px}
+.transcript-text{font-size:15px;line-height:1.28;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.suggestion{min-height:calc(100vh - 160px);border:1px solid #3a3a3c;padding:16px 18px}
+.suggestion-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.suggestion h2{font-size:12px;margin:0}
+.reasoning{font-size:12px;opacity:.55;text-align:right}
+.suggestion-text,.pinned-text{font-size:24px;line-height:1.42;white-space:pre-wrap}
+.actions{display:flex;gap:6px;align-items:center}
+.suggestion-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.suggestion-grid.pinned{grid-template-columns:1fr 1fr}
+.pane{min-width:0}
+.pinned-pane{display:none;border-left:1px solid #3a3a3c;padding-left:18px}
+.suggestion-grid.pinned .pinned-pane{display:block}
+.pane-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.pane-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.45}
+.hint{opacity:.4;font-size:11px;text-align:right;margin-top:6px}
+/* settings drawer */
+.drawer{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:flex-start;justify-content:flex-end;z-index:10}
+.drawer.open{display:flex}
+.panel{width:min(420px,100%);height:100%;overflow:auto;background:#1c1c1e;border-left:1px solid #3a3a3c;padding:18px}
+.panel h3{margin:18px 0 8px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;opacity:.6}
+.panel h3:first-of-type{margin-top:4px}
+.panel p{font-size:13px;opacity:.7;line-height:1.4;margin:4px 0 10px}
+.file{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #2c2c2e;font-size:13px}
+.file small{opacity:.45}
+.file button{appearance:none;border:0;background:none;color:#ff6961;cursor:pointer;font-size:12px}
+.keyrow{display:flex;gap:6px;margin-bottom:8px}
+.keyrow input{flex:1;min-width:0;background:#111;border:1px solid #3a3a3c;color:#eee;border-radius:8px;padding:7px 9px;font-size:12px}
+.ok{color:#30d158}.muted{opacity:.5}
+.err{color:#ff6961;font-size:12px;min-height:16px}
+@media(max-width:650px){
+  main{padding:8px}h1{font-size:15px}
+  .seg button{font-size:11px;padding:5px 7px}
+  .transcript-card{height:105px;padding:9px}.transcript-text{font-size:13px}
+  .suggestion{padding:14px}.suggestion-text,.pinned-text{font-size:20px}
+  .pinned-pane{padding-left:10px}
+}
+/* setup wizard */
+.setup{position:fixed;inset:0;background:#111;z-index:20;overflow:auto;display:none}
+.setup.open{display:block}
+.wiz{width:min(680px,100%);margin:0 auto;padding:40px 22px 60px}
+.wiz .logo{font-size:20px;font-weight:700;margin-bottom:6px}.wiz .logo span{opacity:.5;font-weight:500}
+.dots{display:flex;gap:6px;margin:14px 0 28px}.dots i{height:4px;flex:1;border-radius:2px;background:#2c2c2e}.dots i.on{background:#f2f2f7}
+.wiz h2{font-size:26px;letter-spacing:0;text-transform:none;opacity:1;margin:0 0 8px}
+.wiz .lead{opacity:.65;margin:0 0 22px;font-size:15px;line-height:1.45}
+.choice{display:block;width:100%;text-align:left;background:#1c1c1e;border:1.5px solid #3a3a3c;border-radius:14px;padding:16px 18px;margin-bottom:12px;color:#eee;font:inherit;cursor:pointer}
+.choice:hover{border-color:#636366}.choice.sel{border-color:#f2f2f7}
+.choice b{font-size:16px}
+.tick{display:inline-block;width:18px;height:18px;border:1.5px solid #636366;border-radius:5px;vertical-align:-3px;margin-right:10px}
+.choice.sel .tick{background:#f2f2f7;border-color:#f2f2f7;box-shadow:inset 0 0 0 3px #1c1c1e}
+.dots i{display:block}.choice .d{opacity:.6;font-size:14px;margin-top:4px;line-height:1.4}
+.badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:#30d158;color:#000;border-radius:5px;padding:2px 6px;margin-left:6px;vertical-align:2px}
+.badge.gray{background:#3a3a3c;color:#eee}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.wbtn{appearance:none;border:0;background:#f2f2f7;color:#111;border-radius:10px;padding:11px 18px;font:inherit;font-weight:650;font-size:14px;cursor:pointer}
+.wbtn.sec{background:#2c2c2e;color:#eee}.wbtn:disabled{opacity:.35;cursor:default}
+.nav{display:flex;justify-content:space-between;margin-top:26px}
+.box{background:#1c1c1e;border-radius:14px;padding:16px 18px;margin-bottom:12px}
+.bar{height:6px;background:#2c2c2e;border-radius:3px;overflow:hidden;margin-top:10px}.bar div{height:100%;background:#30d158;width:0}
+.wiz input[type=password],.wiz input[type=number]{background:#111;border:1px solid #3a3a3c;color:#eee;border-radius:10px;padding:10px 12px;font-size:14px}
+.wiz input[type=password]{flex:1;min-width:0}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.chip{appearance:none;border:1px solid #3a3a3c;background:#1c1c1e;color:#eee;border-radius:999px;padding:8px 14px;font:inherit;font-size:13px;font-weight:650;cursor:pointer}
+.chip.sel{background:#f2f2f7;color:#111;border-color:#f2f2f7}
+.qr{background:#fff;border-radius:14px;padding:14px;width:220px;height:220px}
+.qr img{width:100%;height:100%;image-rendering:pixelated}
+.url{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:#1c1c1e;border-radius:8px;padding:8px 10px;word-break:break-all}
+.steps-list{margin:0;padding-left:20px;line-height:1.7;opacity:.85}
+.wiz .err{margin-top:8px}
+.wiz a{color:#7c9cff}
+.remote-wait{display:none;position:fixed;inset:0;background:#111;z-index:25;align-items:center;justify-content:center;text-align:center;padding:30px}
+.remote-wait.open{display:flex}
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar">
+    <div class="brand">
+      <h1>Thinking<span>Partner</span></h1>
+      <select id="mode" aria-label="Conversation mode"></select>
+      <div class="seg" id="providers" aria-label="Reasoning model">
+        <button data-provider="local" class="active" title="Free · runs on your Mac">Local</button>
+        <button data-provider="claude" title="Your Anthropic API key">Claude</button>
+        <button data-provider="openai" title="Your OpenAI API key">ChatGPT</button>
+      </div>
+      <button class="btn" id="screenshotBtn" type="button">Read Screen</button>
+      <button class="btn" id="settingsBtn" type="button">Docs &amp; Settings</button>
+      <button class="btn" id="connectBtn" type="button" style="display:none">Connect iPad / phone</button>
+    </div>
+    <div class="right-status">
+      <div class="status" id="status">Connecting…</div>
+      <div class="small" id="spend"></div>
+      <div class="small" id="screenStatus"></div>
+    </div>
+  </div>
+
+  <section class="transcripts">
+    <div class="card transcript-card"><h2 id="themLabel">Them</h2><div class="transcript-text" id="them">Listening…</div></div>
+    <div class="card transcript-card"><h2>You</h2><div class="transcript-text" id="you">Listening…</div></div>
+  </section>
+
+  <section class="card suggestion">
+    <div class="suggestion-head">
+      <h2 id="suggestionTitle">Suggestion</h2>
+      <div class="actions">
+        <div class="reasoning" id="reasoning"></div>
+        <button class="btn" id="pinBtn" type="button">Pin</button>
+      </div>
+    </div>
+    <div class="suggestion-grid" id="grid">
+      <div class="pane">
+        <div class="pane-head" id="liveHead" style="display:none">
+          <div class="pane-label">Live</div>
+          <button class="btn" id="replacePinBtn" type="button">Replace Pin</button>
+        </div>
+        <div class="suggestion-text" id="suggestion">Suggestions appear here as the conversation unfolds.</div>
+      </div>
+      <div class="pane pinned-pane">
+        <div class="pane-head"><div class="pane-label">Pinned</div><button class="btn" id="unpinBtn" type="button">Unpin</button></div>
+        <div class="pinned-text" id="pinned"></div>
+      </div>
+    </div>
+  </section>
+  <div class="hint" id="hint"></div>
+</main>
+
+<div class="drawer" id="drawer">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>Docs &amp; Settings</strong><button class="btn" id="closeBtn">Done</button>
+    </div>
+
+    <h3>Your documents</h3>
+    <p>CV, briefs, notes, articles — used as background for every suggestion. Stored only on your Mac.</p>
+    <div id="files"></div>
+    <input type="file" id="fileInput" multiple accept=".txt,.md,.markdown,.csv,.json,.pdf,.docx,.rtf,.html" style="margin-top:10px;font-size:12px">
+    <div class="err" id="fileErr"></div>
+
+    <h3>Model &amp; spending</h3>
+    <div id="hostSettings">
+      <p>Change your local model, API keys, or spend limit.</p>
+      <div class="row"><button class="btn" id="rerunSetup">Open setup</button><button class="btn" id="drawerConnect">Connect iPad / phone</button></div>
+    </div>
+    <p id="remoteSettings" style="display:none">Models, keys and spending are managed on the Mac running ThinkingPartner.</p>
+  </div>
+</div>
+
+
+<div class="setup" id="setup">
+  <div class="wiz">
+    <div class="logo">Thinking<span>Partner</span></div>
+    <div class="dots" id="dots"></div>
+
+    <!-- choose engines (any combination) -->
+    <section data-id="engines">
+      <h2>Which AI should ThinkingPartner use?</h2>
+      <p class="lead">Pick one or more. If you set up several, you can switch between them any time from your iPad. Transcription always runs privately on your Mac.</p>
+      <button class="choice" data-engine="local"><span class="tick"></span><b>Free, on this Mac</b> <span class="badge">Private</span> <span class="badge gray" data-ready="local">Ready</span>
+        <div class="d">Qwen, an open model that runs on your Mac through Ollama. No account, no cost, works offline. One-time download of 3–9 GB.</div></button>
+      <button class="choice" data-engine="claude"><span class="tick"></span><b>Claude</b> <span class="badge gray">Your API key</span> <span class="badge gray" data-ready="claude">Ready</span>
+        <div class="d">Anthropic's Claude. Strong reasoning and screen reading. You pay Anthropic for what you use.</div></button>
+      <button class="choice" data-engine="openai"><span class="tick"></span><b>ChatGPT</b> <span class="badge gray">Your API key</span> <span class="badge gray" data-ready="openai">Ready</span>
+        <div class="d">OpenAI's models. Strong reasoning and screen reading. You pay OpenAI for what you use.</div></button>
+      <p class="small" style="max-width:none;text-align:left;white-space:normal">Tip: also tick the free option, so you still get answers if you hit your spending limit or lose internet.</p>
+      <div class="nav"><span></span><button class="wbtn" id="nextEngines" disabled>Continue</button></div>
+    </section>
+
+    <!-- local model -->
+    <section data-id="local">
+      <h2>Set up the free local model</h2>
+      <p class="lead" id="ramLine"></p>
+      <div id="ollamaMissing" class="box" style="display:none">
+        <b>First, install Ollama</b>
+        <p class="lead" style="margin:6px 0 12px">Ollama is a free app that runs AI models on your Mac. Download it, open it once, then come back here.</p>
+        <div class="row"><a class="wbtn" href="https://ollama.com/download" target="_blank" rel="noopener">Download Ollama</a><button class="wbtn sec" id="recheck">I've installed it</button></div>
+      </div>
+      <div id="ollamaStopped" class="box" style="display:none">
+        <b>Ollama is installed but not running.</b>
+        <div class="row" style="margin-top:10px"><button class="wbtn" id="startOllama">Start Ollama</button></div>
+      </div>
+      <div id="modelList"></div>
+      <div id="pullBox" class="box" style="display:none"><div id="pullText"></div><div class="bar"><div id="pullBar"></div></div></div>
+      <p class="small" id="modelsLoc" style="margin:4px 0 0;max-width:none;white-space:normal;text-align:left"></p>
+      <div class="err" id="localErr"></div>
+      <div class="nav"><button class="wbtn sec" data-back>Back</button><button class="wbtn" id="nextLocal" disabled>Continue</button></div>
+    </section>
+
+    <!-- one cloud provider (reused for Claude and ChatGPT) -->
+    <section data-id="cloud">
+      <h2 id="cloudTitle">Connect</h2>
+      <p class="lead">Paste your API key. It's checked, then saved in your Mac's Keychain. It is only ever sent to that provider.</p>
+      <div class="box">
+        <div id="keyHelp" class="lead" style="margin:0 0 10px;font-size:14px"></div>
+        <div class="row"><input type="password" id="keyInput" autocomplete="off" placeholder="Paste your API key"><button class="wbtn" id="saveKey">Verify &amp; save</button></div>
+        <div class="err" id="keyErr2"></div>
+        <div id="keyOk" style="display:none;color:#30d158;margin-top:8px">✓ Connected</div>
+      </div>
+      <div class="box" id="limitBox">
+        <b>Spending limit</b> <span class="small" id="limitScope" style="display:inline;margin:0"></span>
+        <p class="lead" style="margin:6px 0 12px;font-size:14px">When ThinkingPartner has spent this much across your API keys (counted until you reset it), it stops using paid models and switches to the free local model if you've set one up. Live spending is shown on the dashboard.</p>
+        <div class="row"><button class="chip" data-limit="5">$5</button><button class="chip" data-limit="10">$10</button><button class="chip" data-limit="25">$25</button><button class="chip" data-limit="50">$50</button>
+          <span style="opacity:.6">or $</span><input type="number" id="limitCustom" min="1" max="10000" step="1" style="width:90px"></div>
+        <p class="small" id="spentLine" style="margin:10px 0 0;max-width:none;text-align:left"></p>
+      </div>
+      <div class="nav"><button class="wbtn sec" data-back>Back</button><button class="wbtn" id="nextCloud" disabled>Continue</button></div>
+    </section>
+
+    <!-- documents + default -->
+    <section data-id="docs">
+      <h2>Add your documents <span class="badge gray">Optional</span></h2>
+      <p class="lead">Your CV, project brief, meeting notes or prep. ThinkingPartner uses them to give answers that sound like you. They stay on your Mac.</p>
+      <div class="box"><div id="wizFiles"></div><input type="file" id="wizFileInput" multiple accept=".txt,.md,.markdown,.csv,.json,.pdf,.docx,.rtf,.html" style="margin-top:10px"><div class="err" id="wizFileErr"></div></div>
+      <div class="box" id="defaultBox">
+        <b>Start with</b>
+        <p class="lead" style="margin:6px 0 12px;font-size:14px">Which one should answer when you open ThinkingPartner? You can switch any time with the buttons at the top of the iPad screen.</p>
+        <div class="row" id="defaultChips"></div>
+      </div>
+      <div class="nav"><button class="wbtn sec" data-back>Back</button><button class="wbtn" id="nextDocs">Continue</button></div>
+    </section>
+
+    <!-- pair device -->
+    <section data-id="pair">
+      <h2>Open it on your iPad or phone</h2>
+      <p class="lead">Suggestions appear on your second device, so nothing shows up when you share your Mac's screen.</p>
+      <div class="row" style="align-items:flex-start;gap:24px">
+        <div class="qr"><img id="qrImg" alt="QR code for the pairing link"></div>
+        <div style="flex:1;min-width:240px">
+          <ol class="steps-list">
+            <li>Connect your iPad or phone to the <b>same Wi‑Fi</b> as this Mac.</li>
+            <li>Open the <b>Camera</b> and point it at the code, or type the link below.</li>
+            <li>Tap <b>Share → Add to Home Screen</b> for a full‑screen app.</li>
+          </ol>
+          <div class="url" id="pairUrl" style="margin-top:12px"></div>
+          <p class="small" style="max-width:none;text-align:left;white-space:normal;margin-top:8px">This link contains a private code. Only share it with your own devices.</p>
+        </div>
+      </div>
+      <div class="box" style="margin-top:18px">
+        <b>Then, in your call:</b>
+        <ol class="steps-list" style="margin-top:6px">
+          <li>Pick a mode on the iPad: Interview, Meeting, Learning or Brainstorm.</li>
+          <li>Start your call on the Mac as usual. ThinkingPartner hears both sides.</li>
+          <li>Glance at the iPad. Tap <b>Pin</b> to keep a useful answer on screen.</li>
+        </ol>
+      </div>
+      <div class="nav"><button class="wbtn sec" id="useMac">Use this Mac's screen instead</button><button class="wbtn" id="finishBtn">Done</button></div>
+    </section>
+  </div>
+</div>
+
+<div class="remote-wait" id="remoteWait"><div><h2 style="font-size:22px;opacity:1;text-transform:none;letter-spacing:0">Almost there</h2><p style="opacity:.65">Finish setting up ThinkingPartner on your Mac, then this screen will start automatically.</p></div></div>
+<script>
+// Pairing token: the terminal prints http://<mac-ip>:8787/#t=TOKEN
+const hashToken=new URLSearchParams(location.hash.slice(1)).get('t');
+if(hashToken){localStorage.setItem('tp-token',hashToken);history.replaceState(null,'',location.pathname)}
+const token=localStorage.getItem('tp-token')||'';
+const $=id=>document.getElementById(id);
+let S={},switching=false,pinnedAnswer=null;
+
+async function api(path,body){
+  const opts={headers:{'X-TP-Token':token},cache:'no-store'};
+  if(body!==undefined){opts.method='POST';opts.headers['Content-Type']='application/json';opts.body=JSON.stringify(body)}
+  const r=await fetch(path,opts);const s=await r.json();
+  if(!r.ok)throw new Error(s.error||'Request failed');
+  return s;
+}
+
+const THEM_LABELS={interview:'Interviewer',meeting:'Others',learning:'Speaker',brainstorm:'Others'};
+
+function render(s){
+  S=s;
+  $('status').textContent=s.status||'Live';
+  if(s.them)$('them').textContent=s.them;
+  if(s.you)$('you').textContent=s.you;
+  if(s.suggestion)$('suggestion').textContent=s.suggestion;
+  $('reasoning').textContent=s.reasoning_status||'';
+  $('screenStatus').textContent=s.screen_status||'';
+  $('themLabel').textContent=THEM_LABELS[s.mode]||'Them';
+  $('suggestionTitle').textContent='Suggestion · '+(s.provider_label||'');
+  const local=s.provider==='local';
+  const spent=+s.spend_usd||0,limit=+s.spend_limit_usd||0;
+  $('spend').textContent=local?'Free · on-device':`Cloud spend $${spent.toFixed(2)} / $${limit.toFixed(2)}`;
+  $('hint').textContent=local?'Local Whisper · local model · nothing leaves this Mac':'Local Whisper · transcript sent to '+(s.provider==='claude'?'Anthropic':'OpenAI');
+  // modes
+  const sel=$('mode');
+  if(!sel.options.length&&s.modes){for(const[k,v]of Object.entries(s.modes)){const o=document.createElement('option');o.value=k;o.textContent=v;sel.appendChild(o)}}
+  if(document.activeElement!==sel)sel.value=s.mode;
+  // providers
+  const avail=s.providers||{};
+  document.querySelectorAll('#providers button').forEach(b=>{
+    const p=b.dataset.provider;
+    b.classList.toggle('active',p===s.provider);
+    b.disabled=switching||(p!=='local'&&(!avail[p]||spent>=limit));
+    b.title=p==='local'?'Free · runs on your Mac':(avail[p]?'Uses your API key':'Add an API key in Docs & Settings');
+  });
+  $('screenshotBtn').disabled=local;
+  $('screenshotBtn').title=local?'Screen reading needs Claude or ChatGPT':'Read the current Mac screen once';
+  // settings
+  const files=s.context_files||[];
+  const sig=JSON.stringify(files);
+  if(sig!==render.filesSig){render.filesSig=sig;
+  $('files').innerHTML=files.length?'':'<p class="muted">No documents yet.</p>';
+  files.forEach(f=>{
+    const row=document.createElement('div');row.className='file';
+    const name=document.createElement('span');name.textContent=f.name+' ';
+    const meta=document.createElement('small');meta.textContent=Math.round(f.chars/1000)+'k chars'+(f.included?'':' · partly used');
+    name.appendChild(meta);
+    const del=document.createElement('button');del.textContent='Remove';
+    del.onclick=()=>api('/api/context/delete',{name:f.name}).then(render).catch(e=>$('fileErr').textContent=e.message);
+    row.append(name,del);$('files').appendChild(row);
+  });}
+  $('hostSettings').style.display=s.is_host?'':'none';
+  $('remoteSettings').style.display=s.is_host?'none':'';
+  $('connectBtn').style.display=s.is_host?'':'none';
+  $('wizFiles').innerHTML=files.length?files.map(f=>'• '+f.name.replace(/[<>&]/g,'')).join('<br>'):'<span class="muted">No documents yet.</span>';
+  // first run: wizard on the Mac, waiting screen elsewhere
+  if(!s.setup_complete){
+    if(s.is_host){if(!$('setup').classList.contains('open'))openSetup('engines')}
+    else $('remoteWait').classList.add('open');
+  }else $('remoteWait').classList.remove('open');
+}
+
+async function choose(path,body){
+  if(switching)return;switching=true;
+  try{render(await api(path,body))}catch(e){$('reasoning').textContent=e.message}finally{switching=false}
+}
+document.querySelectorAll('#providers button').forEach(b=>b.onclick=()=>b.dataset.provider!==S.provider&&choose('/api/provider',{provider:b.dataset.provider}));
+$('mode').onchange=e=>choose('/api/mode',{mode:e.target.value});
+$('screenshotBtn').onclick=()=>api('/api/screenshot',{}).then(render).catch(e=>$('screenStatus').textContent=e.message);
+
+$('settingsBtn').onclick=()=>$('drawer').classList.add('open');
+$('closeBtn').onclick=()=>$('drawer').classList.remove('open');
+$('drawer').onclick=e=>{if(e.target.id==='drawer')$('drawer').classList.remove('open')};
+
+async function uploadFiles(files,errEl){
+  errEl.textContent='';
+  for(const file of files){
+    try{
+      const buf=new Uint8Array(await file.arrayBuffer());let bin='';
+      for(let i=0;i<buf.length;i+=0x8000)bin+=String.fromCharCode.apply(null,buf.subarray(i,i+0x8000));
+      render(await api('/api/context',{name:file.name,data:btoa(bin)}));
+    }catch(err){errEl.textContent=file.name+': '+err.message}
+  }
+}
+$('fileInput').onchange=e=>uploadFiles(e.target.files,$('fileErr')).then(()=>e.target.value='');
+
+
+// ---------------- setup wizard (runs on the Mac only)
+// The flow is built from what the user ticks: engines → [local] → [claude] → [openai] → docs → pair
+const W={flow:['engines','docs','pair'],idx:0,picked:new Set(),touched:false,setup:null,selModel:null,limit:null,timer:null,def:null};
+const NAMES={local:'Free (on this Mac)',claude:'Claude',openai:'ChatGPT'};
+const KEY_HELP={
+  claude:'Get a key at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> → API Keys → Create key. It starts with <code>sk-ant-</code>.',
+  openai:'Get a key at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com</a> → API keys → Create new secret key. It starts with <code>sk-</code>.'};
+const stepId=()=>W.flow[W.idx];
+const cloudOf=id=>id==='claude'||id==='openai'?id:null;
+
+function buildFlow(){
+  W.flow=['engines',...['local','claude','openai'].filter(e=>W.picked.has(e)),'docs','pair'];
+}
+function ready(s){
+  const inst=new Set(s.ollama.models.map(m=>m.name));
+  return {local:s.ollama.running&&inst.has(s.settings.local_model),claude:s.keys.claude,openai:s.keys.openai};
+}
+async function loadSetup(){try{W.setup=await api('/api/setup');renderWizard()}catch(e){}}
+function openSetup(id='engines'){
+  $('setup').classList.add('open');W.touched=false;W.selModel=null;W.limit=null;W.def=null;
+  W.idx=Math.max(0,W.flow.indexOf(id));if(id==='pair'){W.flow=['pair'];W.idx=0}
+  if(W.timer)clearInterval(W.timer);W.timer=setInterval(loadSetup,1000);loadSetup();showStep();
+}
+function closeSetup(){$('setup').classList.remove('open');if(W.timer)clearInterval(W.timer);W.timer=null;W.flow=['engines','docs','pair']}
+function showStep(){
+  const id=stepId(),section=cloudOf(id)?'cloud':id;
+  document.querySelectorAll('#setup section').forEach(sec=>sec.style.display=sec.dataset.id===section?'':'none');
+  $('dots').innerHTML=W.flow.map((_,i)=>`<i class="${i<=W.idx?'on':''}"></i>`).join('');
+  if(id==='pair')$('qrImg').src='/pair.png?'+Date.now();
+  $('keyInput').value='';$('keyErr2').textContent='';
+  window.scrollTo(0,0);renderWizard();
+}
+function next(){if(W.idx<W.flow.length-1){W.idx++;showStep()}}
+function back(){if(W.idx>0){W.idx--;showStep()}}
+
+function renderWizard(){
+  const s=W.setup;if(!s)return;
+  const r=ready(s);
+  // engines: preselect whatever is already set up
+  if(!W.touched&&!W.picked.size){['local','claude','openai'].forEach(e=>{if(r[e])W.picked.add(e)})}
+  document.querySelectorAll('[data-engine]').forEach(b=>b.classList.toggle('sel',W.picked.has(b.dataset.engine)));
+  document.querySelectorAll('[data-ready]').forEach(b=>b.style.display=r[b.dataset.ready]?'':'none');
+  $('nextEngines').disabled=!W.picked.size;
+
+  // local
+  const rec=s.catalog.find(m=>m.name===s.recommended);
+  $('ramLine').textContent=s.ram_gb?`Your Mac has ${s.ram_gb} GB of memory, so we recommend ${s.recommended} (${rec?rec.size_gb:'?'} GB download).`:`We recommend ${s.recommended}.`;
+  $('ollamaMissing').style.display=!s.ollama.installed?'':'none';
+  $('ollamaStopped').style.display=s.ollama.installed&&!s.ollama.running?'':'none';
+  const installed=new Set(s.ollama.models.map(m=>m.name));
+  if(!W.selModel)W.selModel=installed.has(s.settings.local_model)?s.settings.local_model:s.recommended;
+  const list=$('modelList');
+  if(s.ollama.running){
+    const options=[...s.catalog];
+    s.ollama.models.forEach(m=>{if(!options.find(o=>o.name===m.name))options.push({name:m.name,size_gb:m.size_gb,blurb:'Already on your Mac.'})});
+    const sig=JSON.stringify([options.map(o=>o.name),[...installed],W.selModel,s.recommended]);
+    if(sig!==list.dataset.sig){list.dataset.sig=sig;list.innerHTML='';
+      options.forEach(m=>{
+        const inst=installed.has(m.name),b=document.createElement('button');
+        b.className='choice'+(m.name===W.selModel?' sel':'');
+        b.innerHTML=`<b></b>${m.name===s.recommended?' <span class="badge">Recommended</span>':''}${inst?' <span class="badge gray">Downloaded</span>':''}<div class="d"></div>`;
+        b.querySelector('b').textContent=m.name;
+        b.querySelector('.d').textContent=m.blurb+(inst?'':` · ${m.size_gb} GB download`);
+        b.onclick=()=>{W.selModel=m.name;renderWizard()};
+        list.appendChild(b);
+      });
+    }
+  }else{list.innerHTML='';list.dataset.sig=''}
+  const p=s.pull,selInstalled=installed.has(W.selModel);
+  $('pullBox').style.display=(p.active||p.error)?'':'none';
+  if(p.active){const pct=p.total?Math.round(p.completed/p.total*100):0;
+    $('pullText').textContent=`Downloading ${p.model}… ${p.total?pct+'% of '+(p.total/1e9).toFixed(1)+' GB':p.status}`;$('pullBar').style.width=pct+'%'}
+  else if(p.error){$('pullText').textContent='Download failed: '+p.error;$('pullBar').style.width='0'}
+  $('modelsLoc').textContent=s.ollama.running?`Models are stored in ${s.ollama.location}`:'';
+  const nl=$('nextLocal');
+  if(!s.ollama.running){nl.disabled=true;nl.textContent='Continue'}
+  else if(selInstalled){nl.disabled=false;nl.textContent='Use '+W.selModel}
+  else{nl.disabled=p.active;nl.textContent=p.active?'Downloading…':'Download '+W.selModel}
+
+  // cloud (Claude or ChatGPT, whichever step we're on)
+  const c=cloudOf(stepId());
+  if(c){
+    $('cloudTitle').textContent='Connect '+NAMES[c];
+    $('keyHelp').innerHTML=KEY_HELP[c];
+    $('keyOk').style.display=s.keys[c]?'':'none';
+    $('keyInput').placeholder=s.keys[c]?'Key saved. Paste a new one to replace it':'Paste your API key';
+    // one shared limit: show it on the last cloud step only
+    const clouds=W.flow.filter(cloudOf);
+    $('limitBox').style.display=c===clouds[clouds.length-1]?'':'none';
+    $('limitScope').textContent=clouds.length>1?'· shared by Claude and ChatGPT':'';
+    $('nextCloud').disabled=!s.keys[c];
+  }
+  if(W.limit===null)W.limit=s.settings.spend_limit_usd;
+  document.querySelectorAll('[data-limit]').forEach(b=>b.classList.toggle('sel',+b.dataset.limit===+W.limit));
+  if(document.activeElement!==$('limitCustom'))$('limitCustom').value=[5,10,25,50].includes(+W.limit)?'':W.limit;
+  $('spentLine').innerHTML=`Spent so far: $${(+s.spend_usd).toFixed(2)} · <a href="#" id="resetSpend">reset counter</a>`;
+  $('resetSpend').onclick=e=>{e.preventDefault();api('/api/spend/reset',{}).then(x=>{W.setup=x;renderWizard()})};
+
+  // default model: among the picked engines that are ready
+  const usable=['local','claude','openai'].filter(e=>W.picked.has(e)&&r[e]);
+  if(!usable.includes(W.def))W.def=usable.includes(s.settings.provider)?s.settings.provider:usable[0]||null;
+  $('defaultBox').style.display=usable.length>1?'':'none';
+  const chips=$('defaultChips'),csig=usable.join()+W.def;
+  if(chips.dataset.sig!==csig){chips.dataset.sig=csig;chips.innerHTML='';
+    usable.forEach(e=>{const b=document.createElement('button');b.className='chip'+(e===W.def?' sel':'');b.textContent=NAMES[e];b.onclick=()=>{W.def=e;renderWizard()};chips.appendChild(b)})}
+  $('nextDocs').disabled=!W.def;
+  $('pairUrl').textContent=s.pair_url;
+}
+
+document.querySelectorAll('[data-engine]').forEach(b=>b.onclick=()=>{
+  W.touched=true;const e=b.dataset.engine;W.picked.has(e)?W.picked.delete(e):W.picked.add(e);renderWizard()});
+$('nextEngines').onclick=()=>{buildFlow();next()};
+document.querySelectorAll('[data-back]').forEach(b=>b.onclick=back);
+$('recheck').onclick=loadSetup;
+$('startOllama').onclick=async()=>{$('localErr').textContent='Starting Ollama…';
+  try{W.setup=await api('/api/setup/ollama/start',{});$('localErr').textContent=''}catch(e){$('localErr').textContent=e.message}renderWizard()};
+$('nextLocal').onclick=async()=>{
+  $('localErr').textContent='';
+  const installed=new Set(W.setup.ollama.models.map(m=>m.name));
+  try{
+    if(!installed.has(W.selModel)){W.setup=await api('/api/setup/pull',{model:W.selModel});return renderWizard()}
+    W.setup=await api('/api/setup/local-model',{model:W.selModel});next();
+  }catch(e){$('localErr').textContent=e.message}
+};
+$('saveKey').onclick=async()=>{
+  const c=cloudOf(stepId()),btn=$('saveKey');if(!c)return;
+  btn.disabled=true;btn.textContent='Checking…';$('keyErr2').textContent='';
+  try{await api('/api/key',{provider:c,key:$('keyInput').value});$('keyInput').value='';await loadSetup()}
+  catch(e){$('keyErr2').textContent=e.message}
+  finally{btn.disabled=false;btn.textContent='Verify & save'}
+};
+$('keyInput').onkeydown=e=>{if(e.key==='Enter')$('saveKey').click()};
+async function setLimit(v){if(!(v>0))return;W.limit=v;try{W.setup=await api('/api/setup/spend-limit',{limit:v})}catch(e){$('keyErr2').textContent=e.message}renderWizard()}
+document.querySelectorAll('[data-limit]').forEach(b=>b.onclick=()=>setLimit(+b.dataset.limit));
+$('limitCustom').onchange=e=>setLimit(+e.target.value);
+$('nextCloud').onclick=next;
+$('nextDocs').onclick=async()=>{
+  try{W.setup=await api('/api/setup/finish',{provider:W.def});next()}catch(e){$('wizFileErr').textContent=e.message}
+};
+$('finishBtn').onclick=()=>{closeSetup();tick()};
+$('useMac').onclick=()=>{closeSetup();tick()};
+$('wizFileInput').onchange=e=>uploadFiles(e.target.files,$('wizFileErr')).then(()=>e.target.value='');
+$('rerunSetup').onclick=()=>{$('drawer').classList.remove('open');W.picked.clear();openSetup('engines')};
+$('drawerConnect').onclick=()=>{$('drawer').classList.remove('open');openSetup('pair')};
+$('connectBtn').onclick=()=>openSetup('pair');
+
+// pinning
+function setPinned(text){pinnedAnswer=text;$('pinned').textContent=text||'';$('grid').classList.toggle('pinned',!!text);$('liveHead').style.display=text?'flex':'none';$('pinBtn').style.display=text?'none':''}
+$('pinBtn').onclick=()=>{const t=$('suggestion').textContent.trim();if(t)setPinned(t)};
+$('replacePinBtn').onclick=()=>{const t=$('suggestion').textContent.trim();if(t)setPinned(t)};
+$('unpinBtn').onclick=()=>setPinned(null);
+
+async function tick(){
+  try{render(await api('/api/state?'+Date.now()))}
+  catch(e){$('status').textContent=e.message==='Pairing token required'?'Open the pairing link from the Mac terminal':'Disconnected'}
+}
+setInterval(tick,500);tick();
+</script>
+</body>
+</html>
