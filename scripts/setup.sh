@@ -14,7 +14,7 @@ for tool in cmake ffmpeg; do
   command -v "$tool" >/dev/null || missing+=("$tool")
 done
 if (( ${#missing} )); then
-  echo "==> Installing ${missing[*]} with Homebrew…"
+  echo "==> Installing ${missing[*]} with Homebrew… (if Homebrew asks to proceed, type y)"
   brew install "${missing[@]}"
 fi
 
@@ -35,7 +35,7 @@ for cand in python3.13 python3.12 python3.11 python3.10 python3; do
   fi
 done
 if [ -z "$PY" ]; then
-  echo "==> Installing Python 3.12 with Homebrew…"
+  echo "==> Installing Python 3.12 with Homebrew… (if Homebrew asks to proceed, type y)"
   brew install python@3.12
   PY="$(brew --prefix python@3.12)/bin/python3.12"
 fi
